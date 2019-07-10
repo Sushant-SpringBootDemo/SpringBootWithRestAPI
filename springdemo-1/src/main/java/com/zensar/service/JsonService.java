@@ -1,12 +1,15 @@
 package com.zensar.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.demo.Value;
+import com.zensar.model.Value;
 
 @Service
 public class JsonService {
@@ -14,66 +17,57 @@ public class JsonService {
 	@Autowired
 	private RestTemplate restTemplate;
 
-	public Value[] restTemplate() {
-		return restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class);
+	public List<Value> restTemplate() {
+
+		Value[] value = restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class);
+		List<Value> list = new ArrayList<Value>(Arrays.asList(value));
+		return list;
 
 	}
 
-	/*get Json dummy data*/
-	
-	public Value[] getJsonDummyData() {
+	/* get Json dummy data */
+
+	public List<Value> getJsonDummyData() throws Exception {
 
 		return restTemplate();
 
 	}
 
-	/*get count of Endpoints*/
-	
-	public int getCountOfEndpoint() {
-		Value[] val = restTemplate();
-		System.out.println("Count************=" + val.length);
+	/* get count of Endpoints */
 
-		return val != null && val.length > 0 ? val.length : 0;
+	public int getCountOfEndpoint() {
+		List<Value> list = restTemplate();
+		System.out.println("Count************=" + list.size());
+System.out.println("##################################"+list.get(0));
+		return list != null && list.size() > 0 ? list.size() : 0;
 
 	}
 
-	/*get tally of unique user ids*/
-	
-	public Value[] getTallyOfUniqueUserId() {
+	/* get tally of unique user ids */
 
-		HashSet<Value> set = new HashSet<Value>();
-		Value[] val = restTemplate();
-		for (Value v : val) {
-			set.add(v);
-		}
+	public List<Value> getTallyOfUniqueUserId() {
+
+		System.out.println("##################start################");
+
+		HashSet<Value> set = new HashSet<Value>(restTemplate());
+
+		System.out.println("#################end#################");
 
 		System.out.println(" count of unique userid=" + set.size());
-		Value[] uniqueVal = new Value[set.size()];
-		for (Value v : set.toArray(uniqueVal)) {
-			System.out.println("inside array");
 
-			System.out.println("userid:" + v.getUserId());
-			System.out.println("id:" + v.getId());
-			System.out.println("Title:" + v.getTitle());
-			System.out.println("Body:" + v.getBody());
-			System.out.println();
-
-		}
-
-		return uniqueVal;
+		List<Value> list = new ArrayList<Value>(set);
+		return list;
 
 	}
-	
-	
-	public Value[] modifyJSONElement(int index) {
-		Value[] val = restTemplate();
-		Value forthval = val[index-1];
-		forthval.setTitle("1800Flowers");
-		forthval.setBody("1800Flowers");
-		val[index-1] = forthval;
-		return val;
+
+	public List<Value> modifyJSONElement(int index) {
+		List<Value> list = restTemplate();
+		Value v = list.get(index);
+		v.setTitle("1800Flowers");
+		v.setBody("1800Flowers");
+
+		return list;
 
 	}
-	
 
 }
