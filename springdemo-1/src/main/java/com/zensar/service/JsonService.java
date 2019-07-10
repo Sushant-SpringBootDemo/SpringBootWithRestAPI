@@ -36,9 +36,10 @@ public class JsonService {
 	/* get count of Endpoints */
 
 	public int getCountOfEndpoint() {
+		System.out.println("##################hi sushant################");
+
 		List<Value> list = restTemplate();
-		System.out.println("Count************=" + list.size());
-System.out.println("##################################"+list.get(0));
+		System.out.println("Count in service************=" + list.size());
 		return list != null && list.size() > 0 ? list.size() : 0;
 
 	}

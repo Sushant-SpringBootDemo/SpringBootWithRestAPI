@@ -21,7 +21,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,17 +36,18 @@ import com.zensar.service.JsonService;
 @SpringBootTest
 public class Springdemo1ApplicationTests {
 
-	@InjectMocks
-	private JsonService jsonService;
+	@Mock
+	/*@InjectMocks*/
+	public JsonService jsonService;
 
 	@Mock
-	private RestTemplate restTemplate;
+	public RestTemplate restTemplate;
 
 	@Autowired
-	private RestApiController restApiController;
+	@InjectMocks
+	public RestApiController restApiController;
 
-	private int index = 2;
-	public List<Value> list, uniquelist;
+	public List<Value> list, uniquelist, datalist;
 	public Set<Value> set;
 	public Value[] value;
 
@@ -107,8 +107,9 @@ public class Springdemo1ApplicationTests {
 
 	@Test
 	public void countendpointTest() {
-		System.out.println("####################" + value[0].getTitle());
-		Mockito.when(restTemplate.getForObject(Mockito.anyString(), Value[].class)).thenReturn(value);
+		when(restTemplate.getForObject("", Value[].class)).thenReturn(value);
+
+		when(jsonService.getCountOfEndpoint()).thenReturn(list.size());
 
 		int count = restApiController.countendpoint();
 		assertEquals(100, count);
@@ -117,18 +118,19 @@ public class Springdemo1ApplicationTests {
 
 	@Test
 	public void TallyOfUniqueUserIdTest() {
-		Mockito.when(restTemplate.getForObject("", Value[].class)).thenReturn(value);
+		when(jsonService.getTallyOfUniqueUserId()).thenReturn(uniquelist);
+		when(restTemplate.getForObject("", Value[].class)).thenReturn(value);
 
-		List<Value> datalist = restApiController.tallyUniqueUserId();
+		datalist = restApiController.tallyUniqueUserId();
 		assertNotNull(datalist);
 		assertEquals(10, datalist.size());
-	
 
 	}
 
 	@Test
 	public void modifyJSONElementTest() throws Exception {
 
+		// when(restTemplate.getForObject("", Value[].class)).thenReturn(value);
 		/*
 		 * System.out.println("val length:"+val.length);
 		 * 

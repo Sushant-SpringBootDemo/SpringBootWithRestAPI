@@ -17,6 +17,9 @@ public class RestApiController {
 	@Autowired(required = true)
 	private JsonService jsonService;
 
+	
+	
+	
 	@RequestMapping(value = "/getJsonDummyData", method = RequestMethod.GET)
 	public List<Value> getJsonData() throws Exception {
 
@@ -26,7 +29,10 @@ public class RestApiController {
 
 	@RequestMapping(value = "/countendpoint", method = RequestMethod.GET)
 	public int countendpoint() {
+		System.out.println("###########################how are u#####################");
+
 		int count = jsonService.getCountOfEndpoint();
+		System.out.println("Count in controller************=" + count);
 
 		return count;
 
