@@ -36,10 +36,8 @@ public class JsonService {
 	/* get count of Endpoints */
 
 	public int getCountOfEndpoint() {
-		System.out.println("##################hi sushant################");
 
 		List<Value> list = restTemplate();
-		System.out.println("Count in service************=" + list.size());
 		return list != null && list.size() > 0 ? list.size() : 0;
 
 	}
@@ -48,11 +46,7 @@ public class JsonService {
 
 	public List<Value> getTallyOfUniqueUserId() {
 
-		System.out.println("##################start################");
-
 		HashSet<Value> set = new HashSet<Value>(restTemplate());
-
-		System.out.println("#################end#################");
 
 		System.out.println(" count of unique userid=" + set.size());
 

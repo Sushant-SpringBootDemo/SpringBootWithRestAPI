@@ -37,7 +37,7 @@ import com.zensar.service.JsonService;
 public class Springdemo1ApplicationTests {
 
 	@Mock
-	/*@InjectMocks*/
+	/* @InjectMocks */
 	public JsonService jsonService;
 
 	@Mock
@@ -107,9 +107,8 @@ public class Springdemo1ApplicationTests {
 
 	@Test
 	public void countendpointTest() {
-		when(restTemplate.getForObject("", Value[].class)).thenReturn(value);
-
 		when(jsonService.getCountOfEndpoint()).thenReturn(list.size());
+		when(restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class)).thenReturn(value);
 
 		int count = restApiController.countendpoint();
 		assertEquals(100, count);
@@ -117,9 +116,20 @@ public class Springdemo1ApplicationTests {
 	}
 
 	@Test
+	public void dummydataTest() throws Exception {
+		when(jsonService.getJsonDummyData()).thenReturn(list);
+		when(restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class)).thenReturn(value);
+
+		datalist = restApiController.getJsonData();
+
+		assertEquals(100, datalist.size());
+
+	}
+
+	@Test
 	public void TallyOfUniqueUserIdTest() {
 		when(jsonService.getTallyOfUniqueUserId()).thenReturn(uniquelist);
-		when(restTemplate.getForObject("", Value[].class)).thenReturn(value);
+		when(restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class)).thenReturn(value);
 
 		datalist = restApiController.tallyUniqueUserId();
 		assertNotNull(datalist);
