@@ -1,44 +1,39 @@
 package com.zensar.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.zensar.model.Value;
+import com.zensar.repository.JsonRepository;
 
 @Service
 public class JsonService {
 
 	@Autowired
-	private RestTemplate restTemplate;
+	private JsonRepository jsonRepository;
 
-	public List<Value> restTemplate() {
-
-		Value[] value = restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class);
-		List<Value> list = new ArrayList<Value>(Arrays.asList(value));
-		return list;
-
-	}
-
-	/* get Json dummy data */
+	/* Get Json dummy data */
 
 	public List<Value> getJsonDummyData() throws Exception {
 
-		return restTemplate();
+		return jsonRepository.restTemplate();
 
 	}
 
-	/* get count of Endpoints */
+	/* Get count of Endpoints */
 
 	public int getCountOfEndpoint() {
 
-		List<Value> list = restTemplate();
-		return list != null && list.size() > 0 ? list.size() : 0;
+		System.out.println("###########################Checkpoint 2 inside  service countendpoint#####################");
+		System.out.println("jsonRepository:::" + jsonRepository);
+
+		List<Value> list = jsonRepository.restTemplate();
+
+		return (list.size() > 0 && list != null) ? list.size() : 0;
 
 	}
 
@@ -46,9 +41,9 @@ public class JsonService {
 
 	public List<Value> getTallyOfUniqueUserId() {
 
-		HashSet<Value> set = new HashSet<Value>(restTemplate());
+		HashSet<Value> set = new HashSet<Value>(jsonRepository.restTemplate());
 
-		System.out.println(" count of unique userid=" + set.size());
+		System.out.println("###############################count of unique userid=########################################" + set.size());
 
 		List<Value> list = new ArrayList<Value>(set);
 		return list;
@@ -56,7 +51,7 @@ public class JsonService {
 	}
 
 	public List<Value> modifyJSONElement(int index) {
-		List<Value> list = restTemplate();
+		List<Value> list = jsonRepository.restTemplate();
 		Value v = list.get(index);
 		v.setTitle("1800Flowers");
 		v.setBody("1800Flowers");

@@ -2,16 +2,13 @@ package com.example.demo;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -19,83 +16,55 @@ import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zensar.controller.RestApiController;
+import com.zensar.main.Springdemo1Application;
 import com.zensar.model.Value;
-import com.zensar.service.JsonService;
 
-@RunWith(MockitoJUnitRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = Springdemo1Application.class)
+@RunWith(SpringRunner.class)
 public class Springdemo1ApplicationTests {
 
-	@Mock
-	/* @InjectMocks */
-	public JsonService jsonService;
-
-	@Mock
+	@MockBean
 	public RestTemplate restTemplate;
 
 	@Autowired
-	@InjectMocks
 	public RestApiController restApiController;
 
-	public List<Value> list, uniquelist, datalist;
-	public Set<Value> set;
-	public Value[] value;
+	@Autowired
+	private WebApplicationContext context;
+
+	private MockMvc mvc;
+
+	public Value[] value, value2;
+	ObjectMapper objectMapper;
 
 	@Before
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
 
-		/*
-		 * Value v1 = new Value(); v1.setId(1); v1.setUserId(1);
-		 * v1.setTitle("1800Flowers"); v1.setBody("1800Flowers");
-		 * 
-		 * 
-		 * 
-		 * Value v2 = new Value(); v2.setId(2); v2.setUserId(2);
-		 * v2.setTitle("1800Flowers"); v2.setBody("1600Flowers");
-		 * 
-		 * 
-		 * val = new Value[2]; val[0] = v1; val[1] = v2;
-		 * System.out.println("val length*************:"+val.length);
-		 */
+		mvc = MockMvcBuilders.webAppContextSetup(context).build();
 
 		JSONParser parser = new JSONParser();
 
-		try (Reader reader = new FileReader("D:\\test.json")) {
+		try (Reader reader = new FileReader(ResourceUtils.getFile("classpath:test.json"))) {
 
 			JSONArray jsonArray = (JSONArray) parser.parse(reader);
 
-			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper = new ObjectMapper();
 
 			value = objectMapper.readValue(jsonArray.toString(), Value[].class);
-
-			list = new ArrayList<Value>(Arrays.asList(value));
-
-			set = new HashSet<>(Arrays.asList(value));
-			uniquelist = new ArrayList<Value>(set);
-
-			System.out.println("**********************for Testing mock data************************************");
-
-			for (int i = 0; i < 5; i++) {
-
-				System.out.println("id=" + list.get(i).getId());
-				System.out.println("userid=" + list.get(i).getUserId());
-				System.out.println("title=" + list.get(i).getTitle());
-				System.out.println("body=" + list.get(i).getBody());
-
-			}
-			System.out.println(
-					"**********************for Testing mock data completed************************************");
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -106,55 +75,90 @@ public class Springdemo1ApplicationTests {
 	}
 
 	@Test
-	public void countendpointTest() {
-		when(jsonService.getCountOfEndpoint()).thenReturn(list.size());
-		when(restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class)).thenReturn(value);
+	public void countendpointTest() throws Exception {
+		Mockito.when(restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class))
+				.thenReturn(value);
+		this.mvc.perform(get("/countendpoint")).andExpect(status().isOk());
 
-		int count = restApiController.countendpoint();
-		assertEquals(100, count);
+		String contentAsString = this.mvc.perform(get("/countendpoint")).andExpect(status().isOk()).andReturn()
+				.getResponse().getContentAsString();
 
-	}
+		System.out.println("contentAsString value" + contentAsString);
 
-	@Test
-	public void dummydataTest() throws Exception {
-		when(jsonService.getJsonDummyData()).thenReturn(list);
-		when(restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class)).thenReturn(value);
-
-		datalist = restApiController.getJsonData();
-
-		assertEquals(100, datalist.size());
+		assertEquals("97", contentAsString);
 
 	}
 
 	@Test
-	public void TallyOfUniqueUserIdTest() {
-		when(jsonService.getTallyOfUniqueUserId()).thenReturn(uniquelist);
-		when(restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class)).thenReturn(value);
+	public void modifyJsonArrayTest() throws Exception {
+		Mockito.when(restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class))
+				.thenReturn(value);
 
-		datalist = restApiController.tallyUniqueUserId();
-		assertNotNull(datalist);
-		assertEquals(10, datalist.size());
+		this.mvc.perform(get("/modifyJSON/4")).andExpect(status().isOk());
+		String responsedata = this.mvc.perform(get("/modifyJSON/4"))
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)).andReturn().getResponse()
+				.getContentAsString();
+		value2 = objectMapper.readValue(responsedata, Value[].class);
+		assertNotNull(value2);
+		assertEquals("1800Flowers", value2[4].getTitle());
+		assertEquals("1800Flowers", value2[4].getBody());
 
 	}
-
 	@Test
-	public void modifyJSONElementTest() throws Exception {
+	public void getJsonDummyDataTest() throws Exception {
+		Mockito.when(restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class))
+				.thenReturn(value);
 
-		// when(restTemplate.getForObject("", Value[].class)).thenReturn(value);
-		/*
-		 * System.out.println("val length:"+val.length);
-		 * 
-		 * when(jsonService.modifyJSONElement(index)).thenReturn(val); Value[]
-		 * value = restApiController.modifyJSON(index);
-		 * 
-		 * System.out.println("value length:"+value.length); assertEquals(2,
-		 * value.length); assertEquals("1800Flowers",
-		 * value[index-1].getTitle());
-		 */
+		this.mvc.perform(get("/getJsonDummyData")).andExpect(status().isOk());
+		String dummydata = this.mvc.perform(get("/getJsonDummyData"))
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)).andReturn().getResponse()
+				.getContentAsString();
+		assertNotNull(dummydata);
 
-		/*
-		 * mockMvc.perform(get("/helloworld")).andExpect(status().isOk());
-		 */
 	}
+	
+	@Test
+	public void tallyUniqueUserIdTest() throws Exception {
+		Mockito.when(restTemplate.getForObject("http://jsonplaceholder.typicode.com/posts", Value[].class))
+				.thenReturn(value);
+
+		this.mvc.perform(get("/tallyUniqueUserId")).andExpect(status().isOk());
+		String uniqueIdcount = this.mvc.perform(get("/tallyUniqueUserId"))
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)).andReturn().getResponse()
+				.getContentAsString();
+		value2 = objectMapper.readValue(uniqueIdcount, Value[].class);
+		assertEquals(10, value2.length);
+
+	}
+
+	/*
+	 * @Test public void countendpointTest() {
+	 * //Mockito.when(jsonRepository.restTemplate()).thenReturn(list);
+	 * 
+	 * //Mockito.when(jsonRepository.restTemplate()).thenReturn(list);
+	 * System.out.println( "INSIDE CONT END POINT TEST"+value.length);
+	 * //Mockito.when(restTemplate.getForObject("",
+	 * Value[].class)).thenReturn(value);
+	 * 
+	 * System.out.println("restApicontroller:::::"+restApiController); int count
+	 * = restApiController.countendpoint(); System.out.println(
+	 * "INSIDE CONT END POINT TEST  count value"+count);
+	 * 
+	 * assertEquals(97, count);
+	 * 
+	 * }
+	 */
+
+	/*
+	 * @Test public void TallyOfUniqueUserIdTest() { //
+	 * Mockito.when(jsonService.getTallyOfUniqueUserId()).thenReturn(uniquelist)
+	 * ; // when(restTemplate.getForObject("",
+	 * Value[].class)).thenReturn(value);
+	 * 
+	 * datalist = restApiController.tallyUniqueUserId();
+	 * assertNotNull(datalist); assertEquals(11, datalist.size());
+	 * 
+	 * }
+	 */
 
 }

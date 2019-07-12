@@ -15,21 +15,22 @@ import com.zensar.service.JsonService;
 public class RestApiController {
 
 	@Autowired(required = true)
-	private JsonService jsonService;
+	public JsonService jsonService;
 
 	@RequestMapping(value = "/getJsonDummyData", method = RequestMethod.GET)
 	public List<Value> getJsonData() throws Exception {
+		List<Value> list = jsonService.getJsonDummyData();
 
-		return jsonService.getJsonDummyData();
+		return list;
 
 	}
 
-	/* testing **************************************/
-
 	@RequestMapping(value = "/countendpoint", method = RequestMethod.GET)
-	public int countendpoint() {
-
+	public Integer countendpoint() {
+		System.out.println("###########################Checkpoint 1 inside countendpoint#####################");
+		System.out.println("json object:::::" + jsonService);
 		int count = jsonService.getCountOfEndpoint();
+		System.out.println("Count in controller************=" + count);
 
 		return count;
 
