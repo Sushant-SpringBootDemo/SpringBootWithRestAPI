@@ -7,7 +7,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.zensar.model.Value;
+import com.zensar.ExceptionHandler.InvalidIndexFoundException;
+import com.zensar.ExceptionHandler.InvalidInputException;
+import com.zensar.ExceptionHandler.InvalidUserException;
+import com.zensar.model.User;
 import com.zensar.repository.JsonRepository;
 
 @Service
@@ -18,7 +21,7 @@ public class JsonService {
 
 	/* Get Json dummy data */
 
-	public List<Value> getJsonDummyData() throws Exception {
+	public List<User> getJsonDummyData() throws Exception {
 
 		return jsonRepository.restTemplate();
 
@@ -28,35 +31,82 @@ public class JsonService {
 
 	public int getCountOfEndpoint() {
 
-		System.out.println("###########################Checkpoint 2 inside  service countendpoint#####################");
+		System.out
+				.println("###########################Checkpoint 2 inside  service countendpoint#####################");
 		System.out.println("jsonRepository:::" + jsonRepository);
 
-		List<Value> list = jsonRepository.restTemplate();
+		List<User> userList = jsonRepository.restTemplate();
 
-		return (list.size() > 0 && list != null) ? list.size() : 0;
+		return (userList.size() > 0 && userList != null) ? userList.size() : 0;
 
 	}
 
 	/* get tally of unique user ids */
 
-	public List<Value> getTallyOfUniqueUserId() {
+	public List<User> getTallyOfUniqueUserId() {
 
-		HashSet<Value> set = new HashSet<Value>(jsonRepository.restTemplate());
+		HashSet<User> userSet = new HashSet<User>(jsonRepository.restTemplate());
 
-		System.out.println("###############################count of unique userid=########################################" + set.size());
+		System.out.println(
+				"###############################count of unique userid=########################################"
+						+ userSet.size());
 
-		List<Value> list = new ArrayList<Value>(set);
-		return list;
+		List<User> userList = new ArrayList<User>(userSet);
+		return userList;
 
 	}
 
-	public List<Value> modifyJSONElement(int index) {
-		List<Value> list = jsonRepository.restTemplate();
-		Value v = list.get(index);
-		v.setTitle("1800Flowers");
-		v.setBody("1800Flowers");
+	public List<User> modifyJSONElement(int index) {
+		List<User> userList = jsonRepository.restTemplate();
+		if(index <= userList.size()&& index >= 0)
+		{
+		User user = userList.get(index - 1);
+		user.setTitle("1800Flowers");
+		user.setBody("1800Flowers");
+		}
+		else
+		{
+			throw new InvalidIndexFoundException("Enter Valid index to modify Element");
+		}
+		return userList;
 
-		return list;
+	}
+
+	public List<User> updateUserList(User user, int id) {
+		List<User> userList = jsonRepository.restTemplate();
+		if (user!= null && id <=userList.size())
+		{
+		for (User user1 : userList) {
+			
+			if (user1.getId() == id) {
+				user1.setId(user.getId());
+				user1.setUserId(user.getUserId());
+				user1.setTitle(user.getTitle());
+				user1.setBody(user.getBody());
+			}
+		}
+		}
+		else
+		{
+			throw new InvalidInputException("Enter UserID within limit");
+		}
+
+		return userList;
+
+	}
+	
+	public List<User> AddUser(User user) {
+		List<User> userList = jsonRepository.restTemplate();
+		if(user != null)
+		{
+		userList.add(user);
+		}
+		else
+		{
+			throw new InvalidUserException("User is Null");
+		}
+
+		return userList;
 
 	}
 

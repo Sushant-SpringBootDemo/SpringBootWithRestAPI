@@ -22,8 +22,8 @@ public class Springdemo1Application {
 
 	/*
 	 * @Bean public CommandLineRunner run(RestTemplate restTemplate) throws
-	 * Exception { return args -> { Value[] val = restTemplate.getForObject(
-	 * "http://jsonplaceholder.typicode.com/posts", Value[].class);
+	 * Exception { return args -> { User[] val = restTemplate.getForObject(
+	 * "http://jsonplaceholder.typicode.com/posts", User[].class);
 	 * //List<Object> searchList= Arrays.asList(obj);
 	 * 
 	 * }; }

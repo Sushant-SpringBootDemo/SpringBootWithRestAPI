@@ -8,7 +8,7 @@
 		<version>2.1.6.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.capgemini</groupId>
+	<groupId>com.zensar</groupId>
 	<artifactId>springbootwithrest</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>springdemo-1</name>
